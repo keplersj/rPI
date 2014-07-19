@@ -104,10 +104,9 @@ begin
       File.open 'pi.txt' do |file|
         puts "Using static pi file 'pi.txt' : #{file}."
         file.each_line do |line|
+          line.gsub!(/[^0-9]/i, '')
           line.to_s.each_char do |char|
-            unless char == '.'
-              @pi_array << char
-            end
+            @pi_array << char
           end
         end
       end
