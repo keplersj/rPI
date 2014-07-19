@@ -52,7 +52,7 @@ end
 
 def create_png
   pi_count = @pi_array.count
-  png_square = sqrt pi_count
+  png_square = (sqrt pi_count).to_i
   image = ChunkyPNG::Image.new(png_square, png_square, ChunkyPNG::Color::WHITE)
 
   x_axis = Array.new(png_square)
@@ -68,7 +68,7 @@ def create_png
       image[x_index, y_index] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(y_index + x_index + x_offset)])
       image.save('pi.png', :interlace => false)
     end
-    x_offset = x_offset + 3
+    x_offset = x_offset + png_square - 1
   end
 end
 
@@ -79,8 +79,8 @@ begin
   puts 'Nothing more, nothing less.'
   puts 'And it has a shitty name.'
 
-  USE_STATIC_PI = false
-  PRINT_PI = true
+  USE_STATIC_PI = true
+  PRINT_PI = false
   @pi_array = Array.new
 
   case USE_STATIC_PI
