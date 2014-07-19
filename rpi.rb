@@ -61,9 +61,7 @@ def create_png
   x_offset = 0
 
   y_axis.each_with_index do |y_item, y_index|
-    puts "Y Axis: #{y_index}"
     x_axis.each_with_index do |x_item, x_index|
-      puts "X Axis: #{x_index}"
       puts "Currently Painting: [#{x_index}, #{y_index}] with Pi digit: #{@pi_array[(y_index + x_index + x_offset)]}"
       image[x_index, y_index] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(y_index + x_index + x_offset)])
       image.save('pi.png', :interlace => false)
