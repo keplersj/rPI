@@ -50,24 +50,42 @@ def find_pixel_color(integer)
   end
 end
 
+def offset(iteration, square)
+  offset = 0
+
+  case iteration
+    when 0
+      0
+    else
+      iteration.times do
+        offset = offset + square - 1
+      end
+  end
+
+  offset
+end
+
 def create_png
   pi_count = @pi_array.count
   png_square = (sqrt pi_count).to_i
   image = ChunkyPNG::Image.new(png_square, png_square, ChunkyPNG::Color::WHITE)
 
-  x_axis = Array.new(png_square)
-  y_axis = Array.new(png_square)
+  threads = []
 
-  x_offset = 0
-
-  y_axis.each_with_index do |y_item, y_index|
-    x_axis.each_with_index do |x_item, x_index|
-      puts "Currently Painting: [#{x_index}, #{y_index}] with Pi digit: #{@pi_array[(y_index + x_index + x_offset)]}"
-      image[x_index, y_index] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(y_index + x_index + x_offset)])
-      image.save('pi.png', :interlace => false)
+   png_square.times do |y|
+    threads << Thread.new do
+      png_square.times do |x|
+        puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n"
+        image[x, y] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(x + y + offset(y, png_square))])
+      end
     end
-    x_offset = x_offset + png_square - 1
   end
+
+  threads.each do |thr|
+    thr.join
+  end
+
+  image.save('pi.png', :interlace => false)
 end
 
 begin
