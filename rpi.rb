@@ -8,6 +8,7 @@
 
 require 'chunky_png'
 require 'mathn'
+require 'ruby-progressbar'
 
 include Math
 
@@ -76,14 +77,16 @@ def create_png
     if MULTITHREADED_RENDERING
       threads << Thread.new do |thread|
         png_square.times do |x|
-          puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n"
+          puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n" if PRINT_PROGRESS
           image[x, y] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(x + y + offset(y, png_square))])
+          @progress_bar.increment if PROGRESS_BAR
         end
       end
     else
       png_square.times do |x|
-        puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n"
+        puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n" if PRINT_PROGRESS
         image[x, y] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(x + y + offset(y, png_square))])
+        @progress_bar.increment if PROGRESS_BAR
       end
     end
   end
@@ -102,10 +105,13 @@ begin
   puts 'Nothing more, nothing less.'
   puts 'And it has a shitty name.'
 
-  USE_STATIC_PI = false
+  USE_STATIC_PI = true
   PRINT_PI = false
   MULTITHREADED_RENDERING = false
+  PROGRESS_BAR = true
+  PRINT_PROGRESS = false
   @pi_array = Array.new
+  @progress_bar = nil
 
   case USE_STATIC_PI
     when true
@@ -128,6 +134,10 @@ begin
       end
     else
       puts 'Please define the USE_STATIC_PI global variable'
+  end
+
+  if PROGRESS_BAR
+    @progress_bar = ProgressBar.create(:title => 'Painting Pi', :total => @pi_array.count)
   end
 
   puts "The array containing the digits of Pi contains #{@pi_array.count} digits."
