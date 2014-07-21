@@ -73,7 +73,14 @@ def create_png
   threads = []
 
    png_square.times do |y|
-    threads << Thread.new do
+    if MULTITHREADED_RENDERING
+      threads << Thread.new do |thread|
+        png_square.times do |x|
+          puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n"
+          image[x, y] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(x + y + offset(y, png_square))])
+        end
+      end
+    else
       png_square.times do |x|
         puts "Currently Painting: [#{x}, #{y}] with Pi digit: #{@pi_array[(x + y + offset(y, png_square))]}\n"
         image[x, y] = ChunkyPNG::Color.from_hex find_pixel_color(@pi_array[(x + y + offset(y, png_square))])
@@ -95,8 +102,9 @@ begin
   puts 'Nothing more, nothing less.'
   puts 'And it has a shitty name.'
 
-  USE_STATIC_PI = true
+  USE_STATIC_PI = false
   PRINT_PI = false
+  MULTITHREADED_RENDERING = false
   @pi_array = Array.new
 
   case USE_STATIC_PI
